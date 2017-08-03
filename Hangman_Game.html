@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="UTF-8">
+    <title>THE HANGMAN GAME</title>
+  </head>
+  <body>
+
+    <div id = "GAME">
+
+      <h1>THE HANGMAN GAME!</h1>
+
+      	<h2>Theme = BIRDS!</h2>
+
+        <h2>Choose a letter</h2>
+
+          <p id="mysteryWord"></p>
+
+          <p id="winsCounter">WINS: 0</p>
+
+          <p id="guessesLeftCounter">GUESSES LEFT: 9</p>
+
+          <p id="guessesList">YOUR GUESSES SO FAR: </p>
+
+    </div>
+
+    <script>
+
+    //array of all possible options
+    var allChoices = ["A","B","C","D","E","F","G","H","I","J","K","L","M","N","O","P","Q","R","S","T","U","V","W","X","Y","Z"];
+
+    //potential mystery words
+    var birds = ["ROBIN","CARDINAL","FINCH","WOODPECKER","SPARROW","EAGLE"];
+
+    //other variables to be used
+    var userArray = [];
+    var wins = 0;
+    var correctLetters = [];
+    var guessesLeft = 9;
+    var mysteryWordArray = [];
+	var myDisplayWord = "";
+
+
+ 	//random mystery word generator
+	function computerPick(){
+		return birds[Math.floor(Math.random() * birds.length)];
+	}
+
+    //run function random mystery word generator
+    var currentWord = computerPick();
+
+    //function to display spaces for number of letters in mystery word
+    function displayWord (){
+        console.log(currentWord);
+        myDisplayWord = "";
+      for (var i =0; i < currentWord.length; i++){
+        myDisplayWord += "_ ";
+      }
+      document.getElementById("mysteryWord").innerHTML = myDisplayWord;
+      console.log(myDisplayWord);
+    }
+
+    //run display mystery word function
+    var screenWord = displayWord();
+
+    console.log(myDisplayWord);
+
+    //function to replace blank space with guessed letter
+    String.prototype.replaceAt = function(index, replacement){
+    	return this.substr(0, index-1) + replacement + this.substr(index);
+    }
+
+    //function to produce array of letters contained in choosen mystery word
+    function populateMysteryWordArray (){
+      for (var t = 0; t < currentWord.length; t++){
+        mysteryWordArray.push(currentWord.charAt(t));
+      }
+    }
+
+    populateMysteryWordArray();
+
+    console.log(mysteryWordArray);
+
+    //function to update counters in HTML
+    function updateCounters(){
+      document.getElementById("winsCounter").innerHTML = "WINS: " + wins;
+      document.getElementById("guessesLeftCounter").innerHTML = "GUESSES LEFT: " + guessesLeft;
+      document.getElementById("guessesList").innerHTML = "YOUR GUESSES SO FAR: " + userArray;
+    }
+
+    //function for user to choose letter
+    document.onkeyup = function(event){
+
+    	console.log("correct: " + correctLetters.length);
+    	console.log("current: " + currentWord.length);
+    	console.log(correctLetters);
+    	console.log(mysteryWordArray);
+
+      //user chooses letter
+      var userLetter = event.key.toUpperCase();
+
+      //check to see if user entered a non-letter key
+      if (allChoices.indexOf(userLetter) < 0){
+        alert("That is not a valid letter choice!  Please choose a letter.");
+      }
+
+      //check if letter has already been used as a guess
+      else if (userArray.indexOf(userLetter) >= 0){
+        alert("That letter has already been guessed!  Please choose another.");
+      }
+
+      else if (correctLetters.indexOf(userLetter) >= 0){
+      	alert("That letter has already been guessed!  Please choose another.");
+      }
+
+      //check if choosen letter not present in mystery word and no more guesses left
+      else if ((mysteryWordArray.indexOf(userLetter) < 0) && (guessesLeft === 1)){
+		guessesLeft = 9;
+		userArray = [];
+		correctLetters = [];
+		console.log(userArray);
+		updateCounters();
+		currentWord = computerPick();
+		screenWord = displayWord();
+		mysteryWordArray = [];
+		populateMysteryWordArray();
+		return;
+      }
+
+      else if (mysteryWordArray.indexOf(userLetter) < 0){
+		guessesLeft --;
+		userArray.push(userLetter);
+		updateCounters();
+      }
+
+      else if ((mysteryWordArray.indexOf(userLetter) >= 0) && (correctLetters.length == currentWord.length-1)){
+      	wins++;
+      	guessesLeft = 9;
+		userArray = [];
+		correctLetters = [];
+		updateCounters();
+		console.log(userArray);
+		currentWord = computerPick();
+		screenWord = displayWord();
+		mysteryWordArray = [];
+		populateMysteryWordArray();
+		return;
+      }
+
+      //check if choosen letter present in mystery word and replace if so
+      else if ((mysteryWordArray.indexOf(userLetter) >= 0) && (correctLetters.length < currentWord.length)){
+		console.log("that is a valid choice");
+		console.log(myDisplayWord);
+			for (var j = 0; j < currentWord.length; j++){
+	 			if(userLetter === currentWord.charAt(j)){
+				console.log(userLetter + " is present at position " + j);
+				myDisplayWord = myDisplayWord.replaceAt((j*2)+1,userLetter);
+				console.log(myDisplayWord);
+				document.getElementById("mysteryWord").innerHTML = myDisplayWord;
+				correctLetters.push(userLetter);
+				}
+			}
+      }
+      
+
+
+    }
+
+    </script>
+    
+  </body>
+
+</html>
